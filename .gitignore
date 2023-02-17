@@ -1,0 +1,6 @@
+/app/renderings/*
+/app/*.png
+/app/target
+/target
+davide-todo.md
+config

@@ -1,0 +1,20 @@
+[package]
+name = "tuot-app"
+version = "0.1.0"
+edition = "2021"
+authors = ["Davide Prati <lastexxit@gmail.com>"]
+
+[dependencies]
+tuot = { path = ".." }
+egui = "0.18.1"
+egui_extras = {version = "0.18.0", features = ["image"]}
+eframe = "0.18"
+glam = "0.21.3"
+
+# added just to make the minimal example needed to open an issue on the egui repo. Remove the image
+# dep when the issue is solved
+image = { version = "0.24", features = ["jpeg", "png"] }
+
+
+[profile.release]
+debug=true

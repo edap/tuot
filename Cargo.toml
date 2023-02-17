@@ -1,0 +1,16 @@
+[package]
+name = "tuot"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+glam = "0.21.3"
+image = { version = "0.24", features = ["jpeg", "png"] }
+rand = { version = "0.8", features = ["small_rng"] }
+rayon = "1.5"
+serde = "1.0"
+# sdfu = "0.3.1-alpha.1"
+sdfu = { version = "0.3.1-alpha.1", features = ["glam"] }
+
