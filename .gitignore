@@ -1,5 +1,6 @@
 /app/renderings/*
 /app/*.png
+/app/*.jpg
 /app/target
 /target
 davide-todo.md
