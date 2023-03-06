@@ -9,8 +9,10 @@ use eframe::egui;
 use egui::CollapsingHeader;
 use egui::Color32;
 use egui_extras::RetainedImage;
+use glam::Vec3A;
 use image::ImageBuffer;
 use image::Rgba;
+use tuot::camera::Camera;
 use std::path::Path;
 use std::time::Instant;
 use tuot;
@@ -24,6 +26,7 @@ use tuot::montecarlo_pimped::renderer::render_montecarlo_pimped;
 use tuot::montecarlo_pimped::tint_opt::BandOp;
 use tuot::montecarlo_pimped::tint_opt::TintOpt;
 use tuot::renderer::render;
+use tuot::utils::obj_to_hitable;
 use tuot::scene::Scene;
 
 #[derive(PartialEq)]
@@ -120,8 +123,9 @@ impl eframe::App for MyApp {
                 let now = Instant::now();
 
                 let render_buffer = match &mut self.render_engine {
-                    RendererEngines::MonteCarlo => render_montecarlo_example(self),
-                    RendererEngines::MonteCarloPimped => render_montecarlo_pimped_example(self),
+                    _ => render_obj(self)
+                    // RendererEngines::MonteCarlo => render_montecarlo_example(self),
+                    // RendererEngines::MonteCarloPimped => render_montecarlo_pimped_example(self),
                 };
 
                 match render_buffer {
@@ -303,6 +307,11 @@ impl eframe::App for MyApp {
     }
 }
 
+// fn render_obj(path: &Path, nx: usize, ny: usize, ns: usize, max_ray_depth: i32) -> Vec<u8> {
+//     println!("Loading OBJ model from {}", path.to_str().unwrap());
+//     let mut world = obj_to_hitable(path);
+// }
+
 fn render_montecarlo_example(a: &mut MyApp) -> Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError> {
     let (mut world, camera) = get_world_and_camera(
         &a.worlds,
@@ -354,6 +363,40 @@ fn render_montecarlo_pimped_example(
         &scene,
     );
     render_buffer_result
+}
+
+fn render_obj(a: &mut MyApp)-> Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError>{
+    let look_at = Vec3A::new(0.0, 0.0, -1.0);
+    let look_from = Vec3A::new(1.1, 0.9, 1.0);
+    let camera = Camera::new(
+        look_from,
+        look_at,
+        a.camera_fov,
+        (a.frame_width as f32) / (a.frame_height as f32),
+        a.camera_aperture,
+    );
+
+    let mut world = obj_to_hitable(&Path::new("assets/susa.obj"))?;
+    //let mut world = obj_to_hitable(&Path::new("assets/susanne.obj"))?;
+    let scene = Scene::new(&mut world, camera);
+
+    a.tint_opt.normal_color = Color::from_array(a.color_normal.to_array());
+    a.tint_opt.background_color = Color::from_array(a.background_color.to_array());
+    let render_buffer_result = render_montecarlo_pimped(
+        a.frame_width,
+        a.frame_height,
+        a.max_depth,
+        a.msaa_samples,
+        a.n_current_frame,
+        a.tot_frames,
+        &a.camera_effects,
+        &a.camera_distorter_opt,
+        &a.deflection_opt,
+        &a.tint_opt,
+        &scene,
+    );
+    render_buffer_result
+
 }
 
 //fn get_save_frame_path() {

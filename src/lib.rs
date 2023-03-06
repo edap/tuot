@@ -18,5 +18,6 @@ pub mod sdf;
 pub mod sdfa;
 pub mod setup;
 pub mod sphere;
+pub mod triangle;
 pub mod texture;
 pub mod utils;

@@ -1,9 +1,11 @@
 use std::fmt;
-
 use crate::aabb::{surrounding_box, Aabb};
 use crate::material::Material;
 use crate::ray::Ray;
 use glam::Vec3A;
+use std::sync::Arc;
+// TODO, Material should be an Arc, as when we load the material from
+// an obj, the same material is shared in a safe thread mode between more triangles
 
 #[derive(Debug, Clone, Copy)]
 pub struct HitRecord<'material> {
