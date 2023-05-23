@@ -1,6 +1,7 @@
 /app/renderings/*
 /app/*.png
 /app/*.jpg
+app/assets/quadMesh.*
 /app/target
 /target
 davide-todo.md

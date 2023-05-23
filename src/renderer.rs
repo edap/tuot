@@ -15,7 +15,7 @@ use std::result::Result;
 
 use crate::hitable::Hitable;
 
-pub fn render(
+pub fn render_montecarlo(
     frame_width: u32,
     frame_height: u32,
     max_depth: usize,

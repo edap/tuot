@@ -10,6 +10,7 @@ egui = "0.18.1"
 egui_extras = {version = "0.18.0", features = ["image"]}
 eframe = "0.18"
 glam = "0.21.3"
+rfd="0.11"
 
 # added just to make the minimal example needed to open an issue on the egui repo. Remove the image
 # dep when the issue is solved

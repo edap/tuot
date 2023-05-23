@@ -1,6 +1,5 @@
 // TODO
-// capire come mai nel default renderer gli sdf sono senza ombre.
-// Hai lasciato un commento nel renderer.
+// why SDF rendering in the default renderer has no shadows, che the comment in the renderer.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use crate::tuot::color::Color;
@@ -25,12 +24,12 @@ use tuot::montecarlo_pimped::deflection_opt::DeflectionOpt;
 use tuot::montecarlo_pimped::renderer::render_montecarlo_pimped;
 use tuot::montecarlo_pimped::tint_opt::BandOp;
 use tuot::montecarlo_pimped::tint_opt::TintOpt;
-use tuot::renderer::render;
-use tuot::utils::obj_to_hitable;
+use tuot::renderer::render_montecarlo;
+use tuot::utils::load_obj_to_hitable;
 use tuot::scene::Scene;
 
 #[derive(PartialEq)]
-enum RendererEngines {
+enum RendererEngine {
     MonteCarlo,
     MonteCarloPimped,
 }
@@ -50,7 +49,7 @@ fn main() {
 }
 
 struct MyApp {
-    render_engine: RendererEngines,
+    render_engine: RendererEngine,
     camera_effects: CameraEffects,
     worlds: Worlds,
     max_depth: usize,
@@ -70,23 +69,22 @@ struct MyApp {
     background_color: Color32,
     color_normal: Color32,
     tint_opt: TintOpt,
+    picked_path: Option<String>,
 }
 
 impl Default for MyApp {
     fn default() -> Self {
         Self {
-            render_engine: RendererEngines::MonteCarlo,
+            render_engine: RendererEngine::MonteCarlo,
             camera_effects: CameraEffects::NoEffects,
             worlds: Worlds::SdfWall,
             last_frame_rendered: None,
-            //max_depth: 25,
             max_depth: 4, //
             image_buffer: None,
             frame_width: 640,
             frame_height: 400,
             camera_fov: 40.0,
             camera_aperture: 0.1,
-            //msaa_samples: 50,
             msaa_samples: 4,
             n_current_frame: 0,
             tot_frames: 25,
@@ -97,6 +95,7 @@ impl Default for MyApp {
             color_normal: Color32::YELLOW,
             background_color: Color32::from_rgb(209, 193, 89),
             tint_opt: TintOpt::default(),
+            picked_path: None,
         }
     }
 }
@@ -105,7 +104,18 @@ impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::SidePanel::left("scene settings").show(ctx, |ui| {
             ui.heading("Scene");
-            CollapsingHeader::new("Worlds")
+            if ui.button("Open file…").clicked() {
+                if let Some(path) = rfd::FileDialog::new().pick_file() {
+                    self.picked_path = Some(path.display().to_string());
+                }
+            }
+
+            if let Some(_) = self.picked_path {
+                if ui.button("Deselect File").clicked() {
+                    self.picked_path = None;
+                }
+            } else {
+                CollapsingHeader::new("Example Worlds")
                 .default_open(true)
                 .show(ui, |ui| {
                     ui.radio_value(&mut self.worlds, Worlds::CornellBox, "Cornell Box");
@@ -116,18 +126,14 @@ impl eframe::App for MyApp {
                     ui.radio_value(&mut self.worlds, Worlds::SdfSpheres, "Sdf Spheres");
                     ui.radio_value(&mut self.worlds, Worlds::SdfWall, "Sdf Wall");
                 });
+            }
         });
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("An imaginary renderer");
             if ui.button("Render").clicked() {
                 let now = Instant::now();
 
-                let render_buffer = match &mut self.render_engine {
-                    _ => render_obj(self)
-                    // RendererEngines::MonteCarlo => render_montecarlo_example(self),
-                    // RendererEngines::MonteCarloPimped => render_montecarlo_pimped_example(self),
-                };
-
+                let render_buffer = render(self);
                 match render_buffer {
                     Ok(render_buffer) => {
                         self.elapsed_time = format!(
@@ -137,8 +143,6 @@ impl eframe::App for MyApp {
                         );
 
                         self.image_buffer = Some(render_buffer);
-                        // TODO, maybe tuot::render( should return directly a an egu::ColorImage?
-                        // we could avoid the following conversion from buffer to ColorImage
                         let color_image = egui::ColorImage::from_rgba_unmultiplied(
                             [self.frame_width as usize, self.frame_height as usize],
                             &self.image_buffer.as_ref().unwrap(),
@@ -149,8 +153,8 @@ impl eframe::App for MyApp {
                         self.last_frame_rendered = Some(last_frame_rendered);
                         self.n_current_frame += 1;
                     }
-                    Err(e) => println!("{}", e),
-                }
+                    Err(e) => println!("{:?}", e),
+                };
             }
             if let Some(img_buffer) = &self.image_buffer {
                 if ui.button("Save Frame").clicked() {
@@ -169,12 +173,12 @@ impl eframe::App for MyApp {
                 .show(ui, |ui| {
                     ui.radio_value(
                         &mut self.render_engine,
-                        RendererEngines::MonteCarlo,
+                        RendererEngine::MonteCarlo,
                         "MonteCarlo",
                     );
                     ui.radio_value(
                         &mut self.render_engine,
-                        RendererEngines::MonteCarloPimped,
+                        RendererEngine::MonteCarloPimped,
                         "T.U.O.T.",
                     );
                 });
@@ -197,7 +201,7 @@ impl eframe::App for MyApp {
                     ui.add(egui::Slider::new(&mut self.msaa_samples, 1..=150));
                 });
             match self.render_engine {
-                RendererEngines::MonteCarloPimped => {
+                RendererEngine::MonteCarloPimped => {
                     CollapsingHeader::new("Camera Effects")
                         .default_open(true)
                         .show(ui, |ui| {
@@ -307,96 +311,67 @@ impl eframe::App for MyApp {
     }
 }
 
-// fn render_obj(path: &Path, nx: usize, ny: usize, ns: usize, max_ray_depth: i32) -> Vec<u8> {
-//     println!("Loading OBJ model from {}", path.to_str().unwrap());
-//     let mut world = obj_to_hitable(path);
-// }
+fn render(a: &mut MyApp) ->  Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError> {
+    let scene;
+    let mut world;
+    let camera;
+    if let Some(path) = &a.picked_path {
+        // TODO, camera should be set depending on the dimension of the object
+        // TODO, load gltf
+        let look_at = Vec3A::new(0.0, 0.0, -1.0);
+        let look_from = Vec3A::new(1.1, 0.9, 1.0);
+        let camera = Camera::new(
+            look_from,
+            look_at,
+            a.camera_fov,
+            (a.frame_width as f32) / (a.frame_height as f32),
+            a.camera_aperture,
+        );
+        world = load_obj_to_hitable(&Path::new(path))?;
+        scene = Scene::new(&mut world, camera);
+    } else {
+        (world, camera) = get_world_and_camera(
+            &a.worlds,
+            a.camera_fov,
+            a.frame_width,
+            a.frame_height,
+            a.camera_aperture,
+        );
+        scene = Scene::new(&mut world, camera);
 
-fn render_montecarlo_example(a: &mut MyApp) -> Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError> {
-    let (mut world, camera) = get_world_and_camera(
-        &a.worlds,
-        a.camera_fov,
-        a.frame_width,
-        a.frame_height,
-        a.camera_aperture,
-    );
-    let scene = Scene::new(&mut world, camera);
-
-    let render_buffer_result = render(
-        a.frame_width,
-        a.frame_height,
-        a.max_depth,
-        a.msaa_samples,
-        a.n_current_frame,
-        a.tot_frames,
-        //&camera, // in the future, it could be a pool of cameras.
-        &scene,
-    );
-    render_buffer_result
-}
-
-fn render_montecarlo_pimped_example(
-    a: &mut MyApp,
-) -> Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError> {
-    let (mut world, camera) = get_world_and_camera(
-        &a.worlds,
-        a.camera_fov,
-        a.frame_width,
-        a.frame_height,
-        a.camera_aperture,
-    );
-    let scene = Scene::new(&mut world, camera);
-
-    a.tint_opt.normal_color = Color::from_array(a.color_normal.to_array());
-    a.tint_opt.background_color = Color::from_array(a.background_color.to_array());
-    let render_buffer_result = render_montecarlo_pimped(
-        a.frame_width,
-        a.frame_height,
-        a.max_depth,
-        a.msaa_samples,
-        a.n_current_frame,
-        a.tot_frames,
-        &a.camera_effects,
-        &a.camera_distorter_opt,
-        &a.deflection_opt,
-        &a.tint_opt,
-        &scene,
-    );
-    render_buffer_result
-}
-
-fn render_obj(a: &mut MyApp)-> Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError>{
-    let look_at = Vec3A::new(0.0, 0.0, -1.0);
-    let look_from = Vec3A::new(1.1, 0.9, 1.0);
-    let camera = Camera::new(
-        look_from,
-        look_at,
-        a.camera_fov,
-        (a.frame_width as f32) / (a.frame_height as f32),
-        a.camera_aperture,
-    );
-
-    let mut world = obj_to_hitable(&Path::new("assets/susa.obj"))?;
-    //let mut world = obj_to_hitable(&Path::new("assets/susanne.obj"))?;
-    let scene = Scene::new(&mut world, camera);
-
-    a.tint_opt.normal_color = Color::from_array(a.color_normal.to_array());
-    a.tint_opt.background_color = Color::from_array(a.background_color.to_array());
-    let render_buffer_result = render_montecarlo_pimped(
-        a.frame_width,
-        a.frame_height,
-        a.max_depth,
-        a.msaa_samples,
-        a.n_current_frame,
-        a.tot_frames,
-        &a.camera_effects,
-        &a.camera_distorter_opt,
-        &a.deflection_opt,
-        &a.tint_opt,
-        &scene,
-    );
-    render_buffer_result
-
+    }
+    match a.render_engine {
+        RendererEngine::MonteCarlo => {
+            return render_montecarlo(
+                a.frame_width,
+                a.frame_height,
+                a.max_depth,
+                a.msaa_samples,
+                a.n_current_frame,
+                a.tot_frames,
+                //&camera, // in the future, it could be a pool of cameras.
+                &scene,
+            );
+        }
+        RendererEngine::MonteCarloPimped => {
+            a.tint_opt.normal_color = Color::from_array(a.color_normal.to_array());
+            a.tint_opt.background_color = Color::from_array(a.background_color.to_array());
+            return render_montecarlo_pimped(
+                a.frame_width,
+                a.frame_height,
+                a.max_depth,
+                a.msaa_samples,
+                a.n_current_frame,
+                a.tot_frames,
+                &a.camera_effects,
+                &a.camera_distorter_opt,
+                &a.deflection_opt,
+                &a.tint_opt,
+                &scene,
+            );
+        }
+        
+    }
 }
 
 //fn get_save_frame_path() {
