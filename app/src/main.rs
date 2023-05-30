@@ -125,6 +125,8 @@ impl eframe::App for MyApp {
                     ui.radio_value(&mut self.worlds, Worlds::ThreeSphere, "Three Spheres");
                     ui.radio_value(&mut self.worlds, Worlds::SdfSpheres, "Sdf Spheres");
                     ui.radio_value(&mut self.worlds, Worlds::SdfWall, "Sdf Wall");
+                    ui.radio_value(&mut self.worlds, Worlds::SimpleAreaLight, "Area Light");
+                    
                 });
             }
         });

@@ -7,7 +7,7 @@ use tobj::Material as TobjMaterial;
 use crate::color::Color;
 use crate::material::*;
 
-use crate::hitable::{HitableStore, Hitable};
+use crate::hitable::{HitableStore};
 use crate::render_error::RenderError;
 use crate::texture::Texture;
 use crate::triangle::Triangle;
@@ -24,7 +24,6 @@ pub fn random_vec3(min: f32, max: f32) -> Vec3A {
 pub fn random_in_unit_sphere() -> Vec3A {
     loop {
         let p = random_vec3(-1.0, 1.0);
-        // maybe the rng var can be passed as &rng? how much does it cost to create it new every time?
         if p.length_squared() < 1.0 {
             return p;
         }
@@ -46,7 +45,7 @@ pub fn u_v_from_sphere_hit_point(hit_point_on_sphere: Vec3A) -> (f32, f32) {
 }
 
 pub fn schlick(cosine: f32, ref_idx: f32) -> f32 {
-    // schlick
+    // schlick formula
     let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
     r0 = r0 * r0;
     r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
@@ -71,7 +70,7 @@ pub fn reflect(v: &Vec3A, n: &Vec3A) -> Vec3A {
 pub fn load_obj_to_hitable(path: &Path) -> Result<HitableStore, RenderError> {
     let mut hitables = HitableStore::new();
 
-    let obj_file = tobj::load_obj(&path, &tobj::LoadOptions::default())?;
+    let obj_file = load_obj(&path, &tobj::LoadOptions::default())?;
     let models = obj_file.0;
     let mtls = obj_file.1?;
 

@@ -11,6 +11,7 @@ pub mod hitable;
 pub mod material;
 pub mod montecarlo_pimped;
 pub mod ray;
+pub mod rect;
 pub mod render_error;
 pub mod renderer;
 pub mod scene;

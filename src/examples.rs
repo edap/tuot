@@ -5,6 +5,7 @@ use crate::hitable::HitableStore;
 use crate::material::{Dielectric, Material};
 use crate::sdf::TracedSDF;
 use crate::sphere::Sphere;
+use crate::rect::Rect;
 use crate::texture::Texture;
 use crate::utils::random_in_unit_sphere;
 use glam::Vec3A;
@@ -20,6 +21,30 @@ pub enum Worlds {
     VerticalWall,
     SdfSpheres,
     SdfWall,
+    SimpleAreaLight,
+}
+
+pub fn simple_area_light() -> HitableStore {
+    let white = Texture::constant_color(Color {
+        red: 1.0,
+        green: 1.0,
+        blue: 1.0,
+    });
+    let red = Texture::constant_color(Color {
+        red: 1.0,
+        green: 0.0,
+        blue: 0.0,
+    });
+    let area_light = Rect::new_yz((0.0,2.0), (0.0,2.0), 2.0, Material::diffuse_light(white));
+    let sphere = Sphere {
+        position: Vec3A::new(0.0, 0.0, -1.0),
+        radius: 2.0,
+        mat: Material::lambertian(red),
+    }; 
+    let mut hitables = HitableStore::new();
+    hitables.push(area_light);
+    hitables.push(sphere);
+    hitables 
 }
 
 pub fn world_default() -> HitableStore {
@@ -698,6 +723,19 @@ pub fn get_world_and_camera(
                 camera_aperture,
             );
             return (world_cornell_box(), camera);
+        }
+        Worlds::SimpleAreaLight => {
+            let look_from = Vec3A::new(0.0, 0.0, 9.0);
+            let look_at = Vec3A::new(0.0, 0.0, 0.0);
+
+            let camera = Camera::new(
+                look_from,
+                look_at,
+                camera_fov,
+                (frame_width as f32) / (frame_height as f32),
+                camera_aperture,
+            );
+            return (simple_area_light(), camera);
         }
         Worlds::Random => {
             let look_at = Vec3A::new(0.0, 0.0, -1.0);
