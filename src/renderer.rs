@@ -65,14 +65,14 @@ pub fn render_montecarlo(
 //     })
 // }
 
-fn background_color(ray: &Ray, col: &mut Color) {
-    // background color, sky in this case.
-    let t = 0.5 * (ray.direction().normalize().y + 1.0);
-    let c = Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t;
-    col.red = c.x;
-    col.green = c.y;
-    col.blue = c.z;
-}
+// fn background_color(ray: &Ray, col: &mut Color) {
+//     // background color, sky in this case.
+//     let t = 0.5 * (ray.direction().normalize().y + 1.0);
+//     let c = Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t;
+//     col.red = c.x;
+//     col.green = c.y;
+//     col.blue = c.z;
+// }
 
 fn color(ray: &Ray, scene: &Scene, max_depth: usize, depth: usize) -> Color {
     let mut col = WHITE;
@@ -101,7 +101,8 @@ fn color(ray: &Ray, scene: &Scene, max_depth: usize, depth: usize) -> Color {
         }
         None => {
             // background color, sky in this case.
-            background_color(ray, &mut col);
+            scene.background;
+            //background_color(ray, &mut col);
         }
     }
     col.clamp()

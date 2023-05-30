@@ -317,6 +317,7 @@ fn render(a: &mut MyApp) ->  Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError>
     let scene;
     let mut world;
     let camera;
+    let background: Color;
     if let Some(path) = &a.picked_path {
         // TODO, camera should be set depending on the dimension of the object
         // TODO, load gltf
@@ -330,16 +331,16 @@ fn render(a: &mut MyApp) ->  Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError>
             a.camera_aperture,
         );
         world = load_obj_to_hitable(&Path::new(path))?;
-        scene = Scene::new(&mut world, camera);
+        scene = Scene::new(&mut world, camera, Color::new(0.0, 0.0, 1.0));
     } else {
-        (world, camera) = get_world_and_camera(
+        (world, camera, background) = get_world_and_camera(
             &a.worlds,
             a.camera_fov,
             a.frame_width,
             a.frame_height,
             a.camera_aperture,
         );
-        scene = Scene::new(&mut world, camera);
+        scene = Scene::new(&mut world, camera, background);
 
     }
     match a.render_engine {

@@ -1,5 +1,6 @@
 use crate::bvh::BvhTree;
 use crate::camera::Camera;
+use crate::color::{Color, self};
 use crate::hitable::HitableStore;
 use crate::sphere::Sphere;
 
@@ -13,21 +14,23 @@ use crate::sphere::Sphere;
 pub struct Scene<'a> {
     pub camera: Camera,
     pub bvh: BvhTree<'a>,
-    pub lights: Vec<Sphere>,
+    pub background: Color,
+
 }
 
 impl<'a> Scene<'a> {
-    pub fn new(models: &'a mut HitableStore, camera: Camera) -> Scene<'a> {
+    pub fn new(models: &'a mut HitableStore, camera: Camera, background:Color) -> Scene<'a> {
         Scene {
             camera,
             bvh: BvhTree::new(models),
-            lights: vec![],
+            background,
+            //lights: vec![],
         }
     }
 
-    pub fn add_spherical_light(&mut self, sphere: Sphere) {
-        self.lights.push(sphere);
-    }
+    // pub fn add_spherical_light(&mut self, sphere: Sphere) {
+    //     self.lights.push(sphere);
+    // }
 
     // TODO, allow to create a scene
     // pub fn cornell_box_world(width: f32, height: f32) -> Scene<'a> {
