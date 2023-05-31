@@ -62,7 +62,8 @@ impl Scatterable for Material {
         match self {
             // just light has an emission value
             Material::DiffuseLight(dl) => dl.emitted(u, v, p),
-            _ => Color::new(0.0, 0.0, 0.0),
+            //_ => Color::new(0.0, 0.0, 0.0),
+            _ => BLACK,
         }
     }
 }
