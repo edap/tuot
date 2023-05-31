@@ -12,6 +12,9 @@ use glam::Vec3A;
 use image::ImageBuffer;
 use image::Rgba;
 use tuot::camera::Camera;
+use tuot::material::Material;
+use tuot::sphere::Sphere;
+use tuot::texture::Texture;
 use std::path::Path;
 use std::time::Instant;
 use tuot;
@@ -321,8 +324,19 @@ fn render(a: &mut MyApp) ->  Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError>
     if let Some(path) = &a.picked_path {
         // TODO, camera should be set depending on the dimension of the object
         // TODO, load gltf
+        // TODO, if there is no light a light is added
         let look_at = Vec3A::new(0.0, 0.0, -1.0);
         let look_from = Vec3A::new(1.1, 0.9, 1.0);
+        let l = Texture::constant_color(Color {
+            red: 1.0,
+            green: 1.0,
+            blue: 1.0,
+        });
+        let light = Sphere {
+            position:Vec3A::new(1.5, 0.5, 0.5),
+            radius: 0.3,
+            mat: Material::diffuse_light(l),
+        };
         let camera = Camera::new(
             look_from,
             look_at,
@@ -331,6 +345,7 @@ fn render(a: &mut MyApp) ->  Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError>
             a.camera_aperture,
         );
         world = load_obj_to_hitable(&Path::new(path))?;
+        world.push(light);
         scene = Scene::new(&mut world, camera, Color::new(0.0, 0.0, 1.0));
     } else {
         (world, camera, background) = get_world_and_camera(

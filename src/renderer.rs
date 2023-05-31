@@ -101,8 +101,7 @@ fn color(ray: &Ray, scene: &Scene, max_depth: usize, depth: usize) -> Color {
         }
         None => {
             // background color, sky in this case.
-            scene.background;
-            //background_color(ray, &mut col);
+            col  = scene.background;
         }
     }
     col.clamp()

@@ -99,10 +99,6 @@ pub fn load_obj_to_hitable(path: &Path) -> Result<HitableStore, RenderError> {
           Some(id) => Arc::clone(&materials[id]),
           None => Arc::clone(&default_mat)
         };
-
-        println!("normals:{:?}", mesh.normals.len());
-        println!("vertices:{:?}", mesh.positions.len());
-        println!("indices:{:?}", mesh.indices.len());
   
         let tri: Triangle;
         // TODO, this code is assuming that all the meshes are triangulated

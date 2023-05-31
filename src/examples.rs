@@ -564,9 +564,9 @@ pub fn world_cornell_box() -> HitableStore {
 }
 
 pub fn world_wall_sdf() -> HitableStore {
-    let w = 8;
-    let h = 8;
-    let step = 5.2;
+    let w = 4;
+    let h = 4;
+    let step = 6.2;
     let sphere_radius = 0.3;
     let min_z = 0.5;
     let max_z = 2.4;
@@ -735,7 +735,7 @@ pub fn get_world_and_camera(
                 (frame_width as f32) / (frame_height as f32),
                 camera_aperture,
             );
-            return (simple_area_light(), camera, Color::new(0.0f32, 0.0f32, 0.0f32));
+            return (simple_area_light(), camera, Color::new(0.0, 0.0, 0.0));
         }
         Worlds::Random => {
             let look_at = Vec3A::new(0.0, 0.0, -1.0);
