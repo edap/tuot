@@ -4,7 +4,6 @@ use crate::ray::Ray;
 use crate::render_error::RenderError;
 use crate::scene::Scene;
 use crate::setup::{BLACK, WHITE};
-use glam::Vec3;
 use image::ImageBuffer;
 use image::Rgba;
 use rayon::prelude::*;

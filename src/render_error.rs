@@ -1,7 +1,6 @@
 use image::ImageError;
 use std::fmt;
 use std::io;
-use tobj::LoadError;
 
 // https://learning-rust.github.io/docs/e7.custom_error_types.html
 

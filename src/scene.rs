@@ -1,8 +1,7 @@
 use crate::bvh::BvhTree;
 use crate::camera::Camera;
-use crate::color::{Color, self};
+use crate::color::Color;
 use crate::hitable::HitableStore;
-use crate::sphere::Sphere;
 
 // use crate::color::Color;
 // use crate::disc::Disc;
