@@ -35,15 +35,19 @@ pub fn simple_area_light() -> HitableStore {
         green: 0.0,
         blue: 0.0,
     });
+    let noise = Material::lambertian(Texture::noise(8.0));
+
     let area_light = Rect::new_yz((-2.0,2.0), (-2.0,2.0), 4.0, Material::diffuse_light(white));
     let sphere = Sphere {
         position: Vec3A::new(0.0, 0.0, -1.0),
         radius: 2.0,
         mat: Material::lambertian(red),
-    }; 
+    };
+    let floor = Rect::new_xz((-8.0, 8.0), (-8.0, 8.0), -2.0, noise);
     let mut hitables = HitableStore::new();
     hitables.push(area_light);
     hitables.push(sphere);
+    hitables.push(floor);
     hitables 
 }
 
@@ -722,7 +726,7 @@ pub fn get_world_and_camera(
                 (frame_width as f32) / (frame_height as f32),
                 camera_aperture,
             );
-            return (world_cornell_box(), camera, Color::new(0.0f32, 0.0f32, 0.0f32));
+            return (world_cornell_box(), camera, Color::new(0.70, 0.80, 1.00));
         }
         Worlds::SimpleAreaLight => {
             let look_from = Vec3A::new(0.0, 0.0, 9.0);
@@ -735,7 +739,8 @@ pub fn get_world_and_camera(
                 (frame_width as f32) / (frame_height as f32),
                 camera_aperture,
             );
-            return (simple_area_light(), camera, Color::new(0.0, 0.0, 0.0));
+            //return (simple_area_light(), camera, Color::new(0.0, 0.0, 0.0));
+            return (simple_area_light(), camera, Color::new(0.4, 0.7, 1.0));
         }
         Worlds::Random => {
             let look_at = Vec3A::new(0.0, 0.0, -1.0);
@@ -748,7 +753,7 @@ pub fn get_world_and_camera(
                 (frame_width as f32) / (frame_height as f32),
                 camera_aperture,
             );
-            return (world_random(), camera, Color::new(0.0f32, 0.0f32, 0.0f32));
+            return (world_random(), camera, Color::new(0.70, 0.80, 1.00));
         }
         Worlds::RandomGlass => {
             let look_at = Vec3A::new(0.0, 0.0, -1.0);
@@ -761,7 +766,7 @@ pub fn get_world_and_camera(
                 (frame_width as f32) / (frame_height as f32),
                 camera_aperture,
             );
-            return (world_random_glass(), camera, Color::new(0.0f32, 0.0f32, 0.0f32));
+            return (world_random_glass(), camera, Color::new(0.70, 0.80, 1.00));
         }
         Worlds::VerticalWall => {
             let look_at = Vec3A::new(0.0, 0.0, -1.0);
@@ -774,7 +779,7 @@ pub fn get_world_and_camera(
                 (frame_width as f32) / (frame_height as f32),
                 camera_aperture,
             );
-            return (world_random_vertical_wall(), camera, Color::new(0.0f32, 0.0f32, 0.0f32));
+            return (world_random_vertical_wall(), camera, Color::new(0.70, 0.80, 1.00));
         }
         Worlds::ThreeSphere => {
             let look_at = Vec3A::new(0.0, 0.0, -1.0);
@@ -787,7 +792,7 @@ pub fn get_world_and_camera(
                 (frame_width as f32) / (frame_height as f32),
                 camera_aperture,
             );
-            return (world_default(), camera, Color::new(0.0f32, 0.0f32, 0.0f32));
+            return (world_default(), camera, Color::new(0.70, 0.80, 1.00));
         }
 
         Worlds::SdfSpheres => {
@@ -801,7 +806,7 @@ pub fn get_world_and_camera(
                 (frame_width as f32) / (frame_height as f32),
                 camera_aperture,
             );
-            return (world_sdf(), camera, Color::new(0.0f32, 0.0f32, 0.0f32));
+            return (world_sdf(), camera, Color::new(0.70, 0.80, 1.00));
         }
         Worlds::SdfWall => {
             let look_at = Vec3A::new(0.0, 0.0, -1.0);
@@ -815,7 +820,7 @@ pub fn get_world_and_camera(
                 (frame_width as f32) / (frame_height as f32),
                 camera_aperture,
             );
-            return (world_wall_sdf(), camera, Color::new(0.0f32, 0.0f32, 0.0f32));
+            return (world_wall_sdf(), camera, Color::new(0.70, 0.80, 1.00));
         }
     }
 }

@@ -1,7 +1,6 @@
 use core::fmt;
 use image::{Pixel, Rgba};
 use rand::Rng;
-//use serde::Deserialize;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul};
 
 const GAMMA: f32 = 2.2;

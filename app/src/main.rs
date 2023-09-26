@@ -1,5 +1,6 @@
 // TODO
-// why SDF rendering in the default renderer has no shadows, che the comment in the renderer.
+// why SDF rendering in the default renderer has no shadows,
+// see the comment in the renderer.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use crate::tuot::color::Color;

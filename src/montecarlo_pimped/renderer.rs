@@ -8,7 +8,6 @@ use crate::ray::Ray;
 use crate::render_error::RenderError;
 use crate::scene::Scene;
 use crate::setup::{BLACK, WHITE};
-use crate::texture::perlin::Perlin;
 use crate::texture::Texture;
 use glam::Vec3;
 use image::ImageBuffer;
@@ -45,8 +44,8 @@ pub fn render_montecarlo_pimped(
             coords.push((x, y));
         }
     }
-    let perlin = Perlin::new();
-    let noise = Texture::noise(camera_distorter_opt.noise_scale, perlin);
+
+    let noise = Texture::noise(camera_distorter_opt.noise_scale);
     let pixels: Vec<(u32, u32, Color)> = coords
         .par_iter()
         .map(|&(x, y)| {

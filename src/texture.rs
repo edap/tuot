@@ -11,7 +11,6 @@ use bitmap::Bitmap;
 use checker::Checker;
 use constant_color::ConstantColor;
 use noise::Noise;
-use perlin::Perlin;
 
 /// Texture object.
 #[derive(Clone, Debug)]
@@ -41,11 +40,8 @@ impl Texture {
         Texture::ConstantColor(ConstantColor { color })
     }
 
-    pub fn noise(s: f32, p: Perlin) -> Texture {
-        Texture::Noise(Noise {
-            scale: s,
-            perlin: p,
-        })
+    pub fn noise(s: f32) -> Texture {
+        Texture::Noise(Noise::new(s))
     }
 
     pub fn value(&self, u: f32, v: f32, p: Vec3A) -> Color {
