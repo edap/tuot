@@ -4,6 +4,7 @@ use crate::disc::Disc;
 use crate::hitable::HitableStore;
 use crate::material::{Dielectric, Material};
 use crate::sdf::TracedSDF;
+use crate::setup::BLACK;
 use crate::sphere::Sphere;
 use crate::rect::Rect;
 use crate::texture::Texture;
@@ -30,6 +31,7 @@ pub fn simple_area_light() -> HitableStore {
         green: 1.0,
         blue: 1.0,
     });
+
     let red = Texture::constant_color(Color {
         red: 1.0,
         green: 0.0,
@@ -740,7 +742,7 @@ pub fn get_world_and_camera(
                 camera_aperture,
             );
             //return (simple_area_light(), camera, Color::new(0.0, 0.0, 0.0));
-            return (simple_area_light(), camera, Color::new(0.4, 0.7, 1.0));
+            return (simple_area_light(), camera, BLACK);
         }
         Worlds::Random => {
             let look_at = Vec3A::new(0.0, 0.0, -1.0);

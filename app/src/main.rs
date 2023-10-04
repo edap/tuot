@@ -1,6 +1,11 @@
 // TODO
+// finish area light. With no light everuthing should be black. Test the area light example
 // why SDF rendering in the default renderer has no shadows,
 // see the comment in the renderer.
+// TODO SCENE LOADING:
+// camera should be set depending on the dimension of the object
+// load gltf
+// if there is no light a light is added
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use crate::tuot::color::Color;
@@ -63,7 +68,7 @@ struct MyApp {
     frame_height: u32,
     camera_fov: f32,
     camera_aperture: f32,
-    msaa_samples: usize,
+    samples: usize,
     n_current_frame: u32,
     tot_frames: u32,
     _renderings_folder: String,
@@ -89,7 +94,7 @@ impl Default for MyApp {
             frame_height: 400,
             camera_fov: 40.0,
             camera_aperture: 0.1,
-            msaa_samples: 4,
+            samples: 4,
             n_current_frame: 0,
             tot_frames: 25,
             _renderings_folder: "renderings".to_string(),
@@ -204,7 +209,7 @@ impl eframe::App for MyApp {
                     ui.label("max Depth ");
                     ui.add(egui::Slider::new(&mut self.max_depth, 1..=70));
                     ui.label("Antialiasing Samples: ");
-                    ui.add(egui::Slider::new(&mut self.msaa_samples, 1..=150));
+                    ui.add(egui::Slider::new(&mut self.samples, 1..=150));
                 });
             match self.render_engine {
                 RendererEngine::MonteCarloPimped => {
@@ -323,9 +328,6 @@ fn render(a: &mut MyApp) ->  Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError>
     let camera;
     let background: Color;
     if let Some(path) = &a.picked_path {
-        // TODO, camera should be set depending on the dimension of the object
-        // TODO, load gltf
-        // TODO, if there is no light a light is added
         let look_at = Vec3A::new(0.0, 0.0, -1.0);
         let look_from = Vec3A::new(1.1, 0.9, 1.0);
         let l = Texture::constant_color(Color {
@@ -347,7 +349,7 @@ fn render(a: &mut MyApp) ->  Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError>
         );
         world = load_obj_to_hitable(&Path::new(path))?;
         world.push(light);
-        scene = Scene::new(&mut world, camera, Color::new(0.0, 0.0, 1.0));
+        scene = Scene::new(&mut world, camera, Color::new(0.0, 0.0, 0.0));
     } else {
         (world, camera, background) = get_world_and_camera(
             &a.worlds,
@@ -365,7 +367,7 @@ fn render(a: &mut MyApp) ->  Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError>
                 a.frame_width,
                 a.frame_height,
                 a.max_depth,
-                a.msaa_samples,
+                a.samples,
                 a.n_current_frame,
                 a.tot_frames,
                 //&camera, // in the future, it could be a pool of cameras.
@@ -379,7 +381,7 @@ fn render(a: &mut MyApp) ->  Result<ImageBuffer<Rgba<u8>, Vec<u8>>, RenderError>
                 a.frame_width,
                 a.frame_height,
                 a.max_depth,
-                a.msaa_samples,
+                a.samples,
                 a.n_current_frame,
                 a.tot_frames,
                 &a.camera_effects,

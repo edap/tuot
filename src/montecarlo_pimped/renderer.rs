@@ -28,7 +28,7 @@ pub fn render_montecarlo_pimped(
     frame_width: u32,
     frame_height: u32,
     max_depth: usize,
-    n_msaa: usize,
+    samples: usize,
     _current_frame: u32,
     _tot_frames: u32,
     camera_effects: &CameraEffects,
@@ -53,7 +53,7 @@ pub fn render_montecarlo_pimped(
 
             let mut col = BLACK;
 
-            for _s in 0..n_msaa {
+            for _s in 0..samples {
                 let mut rng = rand::thread_rng();
                 let u = ((x as f32) + rng.gen::<f32>()) / (frame_width as f32);
                 let v = ((flipped_y as f32) + rng.gen::<f32>()) / (frame_height as f32);
@@ -80,7 +80,7 @@ pub fn render_montecarlo_pimped(
                     max_depth,
                 );
             }
-            col /= n_msaa as f32;
+            col /= samples as f32;
             (x, y, col)
         })
         .collect();
