@@ -1,11 +1,14 @@
 // TODO
-// finish area light. With no light everuthing should be black. Test the area light example
+// finish cornell box examples. Use rect instead of spheres for the walls.
+// use boxes and implement rotations
+// Make a nice reference picture for the portfolio
 // why SDF rendering in the default renderer has no shadows,
 // see the comment in the renderer.
 // TODO SCENE LOADING:
 // camera should be set depending on the dimension of the object
 // load gltf
 // if there is no light a light is added
+// command line version
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use crate::tuot::color::Color;

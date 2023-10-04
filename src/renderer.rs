@@ -99,7 +99,6 @@ fn color(ray: &Ray, scene: &Scene, max_depth: usize, depth: usize) -> Color {
             }
         }
         None => {
-            // background color, sky in this case.
             col  = scene.background;
         }
     }
