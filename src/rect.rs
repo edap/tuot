@@ -38,6 +38,14 @@ impl Rect {
         Self::new(a_bound, b_bound, Plane::XZ, k, mat)
     }
 
+    pub fn flip_normals(&mut self){
+        match &self.plane {
+            Plane::XY => self.plane_normal.z = self.plane_normal.z * -1.0,
+            Plane::YZ => self.plane_normal.x = self.plane_normal.x * -1.0,
+            Plane::XZ => self.plane_normal.y = self.plane_normal.y * -1.0,
+        }
+    }
+
     fn new(a_bound: (f32, f32), b_bound: (f32, f32), plane: Plane, k: f32, mat: Material) -> Self {
         let (a_idx, b_idx, k_idx, plane_normal) = match plane {
             Plane::XY => (0, 1, 2, Vec3A::new(0.0, 0.0, 1.0)),
@@ -46,6 +54,7 @@ impl Rect {
         };
         Self { a_bound, b_bound, a_idx, b_idx, k_idx, plane, plane_normal, k, mat }
     }
+
 }
 
 impl Hitable for Rect {
