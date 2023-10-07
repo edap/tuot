@@ -505,72 +505,27 @@ pub fn world_cornell_box() -> HitableStore {
     let green = Color::new(0.12, 0.45, 0.15);
     let light = Color::new(1.0, 1.0, 1.0) * 15.0;
 
-    let area_light = Rect::new_xz(
-        (-2.0,2.0), (-2.0,2.0),
-        7.99,
+    let mut area_light = Rect::new_xz(
+        (213.0,343.0), (227.0,332.0),
+        550.0,
         Material::diffuse_light(Texture::constant_color(light)));
-    let floor = Rect::new_xz((-8.0, 8.0), (-8.0, 8.0), -0.0, Material::lambertian(Texture::constant_color(white)));
-    let mut ceil = Rect::new_xz((-8.0, 8.0), (-8.0, 8.0), 8.0, Material::lambertian(Texture::constant_color(white)));
+    area_light.flip_normals();
+    let floor = Rect::new_xz((0.0, 555.0), (0.0, 555.0), 0.0, Material::lambertian(Texture::constant_color(white)));
+    let mut ceil = Rect::new_xz((0.0, 555.0), (0.0, 555.0), 550.0, Material::lambertian(Texture::constant_color(white)));
     ceil.flip_normals();
-    let left_w = Rect::new_yz((-8.0, 8.0), (-8.0, 8.0), -8.0, Material::lambertian(Texture::constant_color(red)));
-    let mut right_w = Rect::new_yz((-8.0, 8.0), (-8.0, 8.0), 8.0, Material::lambertian(Texture::constant_color(green)));
-
-    let spheres: Vec<Sphere> = vec![
-        // right wall
-        // Sphere {
-        //     position: Vec3A::new(5006.0, 0.0, 0.0),
-        //     radius: 5000.0,
-        //     mat: Material::lambertian(Texture::constant_color(green)),
-        // },
-        // // left wall
-        // Sphere {
-        //     position: Vec3A::new(-5006.0, 0.0, 0.0),
-        //     radius: 5000.0,
-        //     mat: Material::lambertian(Texture::constant_color(red)),
-        // },
-        // ceiling
-        // Sphere {
-        //     position: Vec3A::new(0.0, 5010.0, 0.0),
-        //     radius: 5000.0,
-        //     mat: Material::lambertian(Texture::constant_color(white)),
-        // },
-        // floor
-        // Sphere {
-        //     position: Vec3A::new(0.0, -5000.0, 0.0),
-        //     radius: 5000.0,
-        //     mat: Material::lambertian(Texture::constant_color(white)),
-        // },
-        // back wall
-        Sphere {
-            position: Vec3A::new(0.0, 0.0, -5010.0),
-            radius: 5000.0,
-            mat: Material::lambertian(Texture::constant_color(white)),
-        },
-        Sphere {
-            position: Vec3A::new(-3.5, 2.0, -3.0),
-            radius: 2.0,
-            mat: Material::dielectric(1.52),
-        },
-        Sphere {
-            position: Vec3A::new(3.5, 2.0, -7.0),
-            radius: 2.0,
-            mat: Material::metal(Texture::constant_color(Color::new(0.05, 1.0, 0.05)), 0.25),
-        },
-        Sphere {
-            position: Vec3A::new(5.0, 1.0, 0.0),
-            radius: 1.0,
-            mat: Material::metal(Texture::constant_color(Color::new(1.0, 0.05, 0.05)), 0.0),
-        },
-    ];
+    let left_w = Rect::new_yz((0.0, 555.0), (0.0, 555.0), 0.0, Material::lambertian(Texture::constant_color(red)));
+    let mut right_w = Rect::new_yz((0.0, 555.0), (0.0, 555.0), 555.0, Material::lambertian(Texture::constant_color(green)));
+    right_w.flip_normals();
+    let back_w = Rect::new_xy((0.0, 555.0), (0.0, 555.0), 0.0, Material::lambertian(Texture::constant_color(white)));
+    //back_w.flip_normals();
+        
 
     let mut hitables = HitableStore::new();
-    for s in spheres {
-        hitables.push(s);
-    }
     hitables.push(floor);
     hitables.push(ceil);
     hitables.push(left_w);
     hitables.push(right_w);
+    hitables.push(back_w);
     hitables.push(area_light);
     hitables
 
@@ -725,8 +680,8 @@ pub fn get_world_and_camera(
 ) -> (HitableStore, Camera, Color) {
     match w {
         Worlds::CornellBox => {
-            let look_from = Vec3A::new(0.0, 5.0, 15.0);
-            let look_at = Vec3A::new(0.0, 5.0, 0.0);
+            let look_from = Vec3A::new(278.0, 278.0, 800.0);
+            let look_at = Vec3A::new(278.0, 278.0, 0.0);
 
             let camera = Camera::new(
                 look_from,
