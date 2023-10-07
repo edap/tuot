@@ -1,6 +1,5 @@
 use crate::camera::Camera;
 use crate::color::Color;
-use crate::disc::Disc;
 use crate::hitable::HitableStore;
 use crate::material::{Dielectric, Material};
 use crate::sdf::TracedSDF;
@@ -508,25 +507,27 @@ pub fn world_cornell_box() -> HitableStore {
 
     let area_light = Rect::new_xz(
         (-2.0,2.0), (-2.0,2.0),
-        9.99,
+        7.99,
         Material::diffuse_light(Texture::constant_color(light)));
-    let mut floor = Rect::new_xz((-8.0, 8.0), (-8.0, 8.0), 0.0, Material::diffuse_light(Texture::constant_color(white)));
-    floor.flip_normals();
-    //let ceil = Rect::new_xz((-8.0, 8.0), (-8.0, 8.0), 0.0, Material::diffuse_light(Texture::constant_color(green)));
+    let floor = Rect::new_xz((-8.0, 8.0), (-8.0, 8.0), -0.0, Material::lambertian(Texture::constant_color(white)));
+    let mut ceil = Rect::new_xz((-8.0, 8.0), (-8.0, 8.0), 8.0, Material::lambertian(Texture::constant_color(white)));
+    ceil.flip_normals();
+    let left_w = Rect::new_yz((-8.0, 8.0), (-8.0, 8.0), -8.0, Material::lambertian(Texture::constant_color(red)));
+    let mut right_w = Rect::new_yz((-8.0, 8.0), (-8.0, 8.0), 8.0, Material::lambertian(Texture::constant_color(green)));
 
     let spheres: Vec<Sphere> = vec![
         // right wall
-        Sphere {
-            position: Vec3A::new(5006.0, 0.0, 0.0),
-            radius: 5000.0,
-            mat: Material::lambertian(Texture::constant_color(green)),
-        },
-        // left wall
-        Sphere {
-            position: Vec3A::new(-5006.0, 0.0, 0.0),
-            radius: 5000.0,
-            mat: Material::lambertian(Texture::constant_color(red)),
-        },
+        // Sphere {
+        //     position: Vec3A::new(5006.0, 0.0, 0.0),
+        //     radius: 5000.0,
+        //     mat: Material::lambertian(Texture::constant_color(green)),
+        // },
+        // // left wall
+        // Sphere {
+        //     position: Vec3A::new(-5006.0, 0.0, 0.0),
+        //     radius: 5000.0,
+        //     mat: Material::lambertian(Texture::constant_color(red)),
+        // },
         // ceiling
         // Sphere {
         //     position: Vec3A::new(0.0, 5010.0, 0.0),
@@ -567,7 +568,9 @@ pub fn world_cornell_box() -> HitableStore {
         hitables.push(s);
     }
     hitables.push(floor);
-    //hitables.push(ceil);
+    hitables.push(ceil);
+    hitables.push(left_w);
+    hitables.push(right_w);
     hitables.push(area_light);
     hitables
 
