@@ -508,7 +508,7 @@ pub fn world_cornell_box() -> HitableStore {
     let mut area_light = Rect::new_xz(
         (213.0,343.0), (227.0,332.0),
         550.0,
-        Material::diffuse_light(Texture::constant_color(light)));
+        Material::diffuse_light(Texture::constant_color(Color::new(15.0, 15.0, 15.0))));
     area_light.flip_normals();
     let floor = Rect::new_xz((0.0, 555.0), (0.0, 555.0), 0.0, Material::lambertian(Texture::constant_color(white)));
     let mut ceil = Rect::new_xz((0.0, 555.0), (0.0, 555.0), 550.0, Material::lambertian(Texture::constant_color(white)));

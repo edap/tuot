@@ -215,6 +215,7 @@ impl Scatterable for DiffuseLight {
         None
     }
     fn emitted(&self, u: f32, v: f32, p: Vec3A) -> Color {
+        //println!("{}",p.x);
         self.albedo.value(u, v, p)
     }
 }

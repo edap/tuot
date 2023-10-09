@@ -87,6 +87,7 @@ fn color(ray: &Ray, scene: &Scene, max_depth: usize, depth: usize) -> Color {
             let emitted = hit_record
                 .mat
                 .emitted(hit_record.u, hit_record.v, hit_record.pos);
+            //println!("{}", emitted);
             match scattered {
                 Some(scatter) => {
                     if let Some(bounce) = scatter.ray {
